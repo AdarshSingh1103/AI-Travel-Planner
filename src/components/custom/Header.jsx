@@ -20,10 +20,12 @@ const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-  // useEffect(() => {
-  //   console.log("User:", user);
-  // }, []);
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+    document.documentElement.classList.toggle("dark", !darkMode);
+  };
 
   const login = useGoogleLogin({
     onSuccess: (userRes) => getUserProfile(userRes),
@@ -50,7 +52,6 @@ const Header = () => {
         }
       )
       .then((res) => {
-        // console.log(res);
         localStorage.setItem("user", JSON.stringify(res.data));
         setOpenDialog(false);
         window.location.reload();
@@ -60,11 +61,18 @@ const Header = () => {
   return (
     <div className="p-8 shadow-sm flex justify-between items-center w-full">
       <a href="/">
-        <h2 className="font-bold text-lg sm:text-2xl cursor-pointer text-gray-800">
+        <h2 className="font-bold text-lg sm:text-2xl cursor-pointer text-gray-800 dark:text-white">
           Ai Trip Planner
         </h2>
       </a>
-      <div>
+      <div className="flex items-center gap-4">
+      <button
+          onClick={toggleDarkMode}
+          className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded-lg"
+        >
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
+        
         {user ? (
           <div className="flex items-center gap-3">
             <a href="/create-trip">
@@ -95,7 +103,7 @@ const Header = () => {
                     className="w-10 h-10 rounded-full ml-4 cursor-pointer hover:opacity-80 transition-opacity"
                   />
                 </PopoverTrigger>
-                <PopoverContent className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
+                <PopoverContent className="bg-white/95 dark:bg-gray-800 backdrop-blur-sm border border-gray-200 shadow-lg">
                   <div className="flex items-center gap-3 p-2">
                     <img
                       src={user?.picture}
@@ -103,13 +111,13 @@ const Header = () => {
                       className="w-8 h-8 rounded-full"
                     />
                     <div>
-                      <p className="font-medium text-gray-800">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-200">{user.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                     </div>
                   </div>
                   <div
                     onClick={onSignOut}
-                    className="mt-2 p-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
+                    className="mt-2 p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-md cursor-pointer transition-colors"
                   >
                     Sign Out
                   </div>
@@ -125,6 +133,7 @@ const Header = () => {
             Sign In
           </Button>
         )}
+        
       </div>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -134,7 +143,7 @@ const Header = () => {
               Sign in with Google
             </DialogTitle>
             <DialogDescription className="flex flex-col items-center gap-4">
-              To generate a trip, you need to sign in with your google account
+              To generate a trip, you need to sign in with your Google account
               <Button
                 disabled={loading}
                 onClick={() => {
